@@ -475,6 +475,18 @@ document.addEventListener('click', function(e) {
   }
 });
 
+window.addEventListener('scroll', function() {
+  document.querySelectorAll('.custom-select.open').forEach(function(dd) {
+    var portal = document.getElementById('dd-portal-' + dd.id);
+    if (portal) {
+      var rect = dd.querySelector('.cs-selected').getBoundingClientRect();
+      portal.style.top = rect.bottom + 'px';
+      portal.style.left = rect.left + 'px';
+      portal.style.width = rect.width + 'px';
+    }
+  });
+}, true);
+
 function updateSlider(v) {
   document.getElementById('count-val').textContent = v;
   totalCount = parseInt(v);
