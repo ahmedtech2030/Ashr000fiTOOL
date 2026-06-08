@@ -329,7 +329,7 @@ video, canvas { display: none; }
       <span class="slider-label">عدد اللقطات المطلوبة</span>
       <span class="slider-val-badge" id="count-val">10</span>
     </div>
-    <input type="range" id="count-slider" min="5" max="200" value="10" step="5"
+    <input type="range" id="count-slider" min="5" max="45" value="10" step="1"
       oninput="updateSlider(this.value)">
     <div class="slider-ticks" id="slider-ticks">
       <span>5</span><span>50</span><span>100</span><span>150</span><span>200</span>
@@ -546,6 +546,12 @@ function removeVideo() {
   document.getElementById('file-input').value = '';
   document.getElementById('thumb-preview').innerHTML =
     '<svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:#a78bfa;fill:none;stroke-width:1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>';
+  var slider = document.getElementById('count-slider');
+  slider.max = 45;
+  slider.value = 10;
+  document.getElementById('count-val').textContent = 10;
+  document.getElementById('slider-ticks').innerHTML =
+    '<span>5</span><span>15</span><span>25</span><span>35</span><span>45</span>';
 }
 
 function extractScreenshots() {
