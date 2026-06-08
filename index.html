@@ -329,10 +329,10 @@ video, canvas { display: none; }
       <span class="slider-label">عدد اللقطات المطلوبة</span>
       <span class="slider-val-badge" id="count-val">10</span>
     </div>
-    <input type="range" id="count-slider" min="5" max="30" value="10" step="1"
+    <input type="range" id="count-slider" min="5" max="200" value="10" step="5"
       oninput="updateSlider(this.value)">
-    <div class="slider-ticks">
-      <span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span>
+    <div class="slider-ticks" id="slider-ticks">
+      <span>5</span><span>50</span><span>100</span><span>150</span><span>200</span>
     </div>
 
     <div class="controls-grid">
@@ -503,6 +503,23 @@ function loadVideo(file) {
       '<svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:#64748b;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' +
       m + ':' + String(s).padStart(2,'0') + ' دقيقة';
     document.getElementById('extract-btn').disabled = false;
+
+    // Dynamic max based on duration: 45 per minute
+    var minutes = vid.duration / 60;
+    var dynamicMax = Math.max(45, Math.round(minutes * 45));
+    var slider = document.getElementById('count-slider');
+    slider.max = dynamicMax;
+    var defaultVal = Math.min(Math.round(minutes * 10), dynamicMax);
+    defaultVal = Math.max(5, defaultVal);
+    slider.value = defaultVal;
+    document.getElementById('count-val').textContent = defaultVal;
+
+    // Update ticks
+    var t1 = Math.round(dynamicMax * 0.25);
+    var t2 = Math.round(dynamicMax * 0.5);
+    var t3 = Math.round(dynamicMax * 0.75);
+    document.getElementById('slider-ticks').innerHTML =
+      '<span>5</span><span>' + t1 + '</span><span>' + t2 + '</span><span>' + t3 + '</span><span>' + dynamicMax + '</span>';
 
     // thumbnail preview
     var cnv = document.createElement('canvas');
