@@ -3,281 +3,385 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>استخراج لقطات من الفيديو</title>
+<title>الأشروفي تول</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-    background: #f0f2f5;
-    color: #1a1a2e;
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 30px 16px;
-  }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: #0d0d1a;
+  color: #e8e8ff;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  background-image: radial-gradient(ellipse at 20% 20%, rgba(100,80,255,0.12) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 80%, rgba(60,40,200,0.10) 0%, transparent 60%);
+}
 
-  .brand-bar {
-    width: 100%;
-    max-width: 720px;
-    text-align: center;
-    margin-bottom: 12px;
-    letter-spacing: 2px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #6b7280;
-    text-transform: uppercase;
-  }
+.app {
+  width: 100%;
+  max-width: 680px;
+}
 
-  .app {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 32px;
-    width: 100%;
-    max-width: 720px;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
-  }
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, #a78bfa 60%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+.hero-title span {
+  display: inline-block;
+  color: #a78bfa;
+  -webkit-text-fill-color: #a78bfa;
+  font-size: 20px;
+  vertical-align: super;
+  margin-right: 6px;
+}
+.hero-sub {
+  font-size: 18px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+.hero-sub b { color: #c084fc; font-weight: 600; }
+.hero-sub i { color: #60a5fa; font-style: normal; font-weight: 600; }
 
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
+/* Cards */
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+}
 
-  .header-icon {
-    width: 48px; height: 48px;
-    background: #1a1a2e;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-  }
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card-title-icon {
+  width: 40px; height: 40px;
+  background: rgba(139,92,246,0.2);
+  border: 1px solid rgba(139,92,246,0.4);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.card-title-icon svg { width: 20px; height: 20px; stroke: #a78bfa; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-  .header-icon svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* Drop zone */
+#drop-zone {
+  border: 2px dashed rgba(139,92,246,0.4);
+  border-radius: 12px;
+  padding: 36px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(139,92,246,0.04);
+}
+#drop-zone:hover, #drop-zone.drag-over {
+  border-color: #a78bfa;
+  background: rgba(139,92,246,0.10);
+}
+#drop-zone svg { width: 52px; height: 52px; stroke: #a78bfa; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto 14px; }
+#drop-zone p { font-size: 16px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; }
+#drop-zone span { font-size: 13px; color: #64748b; }
 
-  h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
-  .subtitle { font-size: 14px; color: #6b7280; margin-top: 2px; }
+/* File info */
+#file-info {
+  display: none;
+  background: rgba(139,92,246,0.08);
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  align-items: center;
+  gap: 14px;
+}
+.thumb-preview {
+  width: 72px; height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #1e1b4b;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.thumb-preview svg { width: 22px; height: 22px; stroke: #a78bfa; fill: none; stroke-width: 1.8; }
+#file-info-name { font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#file-info-meta { font-size: 12px; color: #64748b; display: flex; gap: 12px; flex-wrap: wrap; }
+#file-info-meta span { display: flex; align-items: center; gap: 4px; }
+.check-badge { width: 28px; height: 28px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.check-badge svg { width: 14px; height: 14px; stroke: #4ade80; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.delete-btn {
+  width: 36px; height: 36px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: background 0.2s;
+}
+.delete-btn:hover { background: rgba(239,68,68,0.2); }
+.delete-btn svg { width: 16px; height: 16px; stroke: #f87171; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* Drop zone */
-  #drop-zone {
-    border: 2px dashed #d1d5db;
-    border-radius: 12px;
-    padding: 40px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    margin-bottom: 20px;
-  }
-  #drop-zone:hover, #drop-zone.drag-over {
-    border-color: #1a1a2e;
-    background: #f8f9ff;
-  }
-  #drop-zone svg { width: 48px; height: 48px; stroke: #9ca3af; margin-bottom: 12px; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  #drop-zone p { font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 4px; }
-  #drop-zone span { font-size: 13px; color: #9ca3af; }
+/* Slider */
+.slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.slider-label { font-size: 15px; color: #94a3b8; }
+.slider-val-badge { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.4); color: #a78bfa; font-size: 15px; font-weight: 700; padding: 2px 12px; border-radius: 20px; }
 
-  /* File info */
-  #file-info {
-    display: none;
-    background: #f3f4f6;
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: 20px;
-    align-items: center;
-    gap: 12px;
-  }
-  #file-info svg { width: 22px; height: 22px; flex-shrink: 0; stroke: #6b7280; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  #file-info-text { flex: 1; min-width: 0; }
-  #file-info-name { font-size: 14px; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #file-info-meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
-  .check-icon { width: 20px; height: 20px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .check-icon svg { width: 12px; height: 12px; stroke: #059669; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+input[type="range"] {
+  width: 100%; height: 6px;
+  -webkit-appearance: none;
+  background: linear-gradient(to left, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.08) 100%);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px rgba(139,92,246,0.5);
+  cursor: pointer;
+}
+.slider-ticks { display: flex; justify-content: space-between; font-size: 11px; color: #475569; }
 
-  /* Controls */
-  .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .control-full { grid-column: 1 / -1; }
+/* Selects */
+.controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.control-item label { font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.control-item label svg { width: 14px; height: 14px; stroke: #64748b; fill: none; stroke-width: 2; }
 
-  label { font-size: 13px; color: #6b7280; display: block; margin-bottom: 6px; font-weight: 500; }
+select {
+  width: 100%; padding: 10px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+select:focus { border-color: rgba(139,92,246,0.5); }
 
-  .slider-row { display: flex; align-items: center; gap: 12px; }
-  input[type="range"] {
-    flex: 1; height: 4px; accent-color: #1a1a2e; cursor: pointer;
-  }
-  .slider-val { font-size: 18px; font-weight: 700; color: #1a1a2e; min-width: 32px; text-align: center; }
+/* Extract button */
+.btn-extract {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  border: none; border-radius: 12px;
+  color: #fff; font-size: 18px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 4px 24px rgba(124,58,237,0.4);
+}
+.btn-extract:hover:not(:disabled) { opacity: 0.9; }
+.btn-extract:active:not(:disabled) { transform: scale(0.99); }
+.btn-extract:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-extract svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-extract .star { font-size: 18px; }
 
-  select {
-    width: 100%; padding: 9px 12px; border: 1.5px solid #e5e7eb;
-    border-radius: 8px; font-size: 14px; color: #1a1a2e;
-    background: #fff; cursor: pointer; outline: none;
-    font-family: inherit;
-    transition: border-color 0.2s;
-  }
-  select:focus { border-color: #1a1a2e; }
+/* Progress */
+#progress-section { display: none; margin-top: 0; }
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+#progress-pct { font-size: 22px; font-weight: 800; color: #a78bfa; }
+#progress-label { font-size: 13px; color: #64748b; }
+.progress-track { background: rgba(255,255,255,0.06); border-radius: 99px; height: 8px; overflow: hidden; margin-bottom: 10px; }
+#progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #7c3aed, #6366f1); border-radius: 99px; transition: width 0.25s; }
+.progress-footer { display: flex; justify-content: space-between; font-size: 12px; color: #475569; }
+.done-badge { display: none; align-items: center; gap: 6px; color: #4ade80; font-size: 14px; font-weight: 600; }
+.done-badge svg { width: 18px; height: 18px; stroke: #4ade80; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* Buttons */
-  .btn-primary {
-    width: 100%; padding: 13px; font-size: 16px; font-weight: 700;
-    background: #1a1a2e; color: #fff; border: none;
-    border-radius: 10px; cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-primary:hover:not(:disabled) { background: #2d2d4e; }
-  .btn-primary:active:not(:disabled) { transform: scale(0.99); }
-  .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
-  .btn-primary svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Results */
+#results-section { display: none; margin-top: 0; }
+.results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+#results-count { font-size: 15px; color: #94a3b8; }
 
-  .btn-secondary {
-    padding: 8px 16px; font-size: 13px; font-weight: 600;
-    background: #fff; color: #1a1a2e;
-    border: 1.5px solid #e5e7eb; border-radius: 8px; cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-    display: flex; align-items: center; gap: 6px;
-    font-family: inherit;
-  }
-  .btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
-  .btn-secondary svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-download-all {
+  padding: 10px 20px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.35);
+  border-radius: 10px;
+  color: #a78bfa; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 8px;
+  transition: background 0.2s;
+}
+.btn-download-all:hover { background: rgba(139,92,246,0.25); }
+.btn-download-all svg { width: 16px; height: 16px; stroke: #a78bfa; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* Progress */
-  #progress-section { display: none; margin-top: 20px; }
-  .progress-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-  #progress-label { font-size: 13px; color: #6b7280; }
-  #progress-pct { font-size: 13px; font-weight: 700; color: #1a1a2e; }
-  .progress-track { background: #e5e7eb; border-radius: 99px; height: 8px; overflow: hidden; }
-  #progress-bar { height: 100%; width: 0%; background: #1a1a2e; border-radius: 99px; transition: width 0.25s; }
+#thumbnails-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 10px;
+}
+.thumb-item {
+  position: relative; border-radius: 10px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08); cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+  background: #1e1b4b;
+}
+.thumb-item:hover { border-color: #a78bfa; transform: scale(1.03); }
+.thumb-item img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+.thumb-num { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; padding: 4px 8px; text-align: center; }
+.thumb-dl-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(139,92,246,0.6); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+.thumb-item:hover .thumb-dl-overlay { opacity: 1; }
+.thumb-dl-overlay svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* Results */
-  #results-section { display: none; margin-top: 28px; }
-  .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  #results-count { font-size: 15px; font-weight: 700; color: #1a1a2e; }
-  .hint { font-size: 12px; color: #9ca3af; margin-bottom: 14px; }
-
-  #thumbnails-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-  }
-
-  .thumb-item {
-    position: relative; border-radius: 8px; overflow: hidden;
-    border: 1.5px solid #e5e7eb; cursor: pointer;
-    transition: border-color 0.2s, transform 0.15s;
-  }
-  .thumb-item:hover { border-color: #1a1a2e; transform: scale(1.02); }
-  .thumb-item img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
-  .thumb-label {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    background: rgba(0,0,0,0.55); color: #fff;
-    font-size: 11px; padding: 3px 7px; text-align: center;
-  }
-  .thumb-dl {
-    position: absolute; top: 5px; left: 5px;
-    background: rgba(0,0,0,0.55); color: #fff;
-    border-radius: 5px; padding: 3px 6px; font-size: 11px;
-    opacity: 0; transition: opacity 0.2s;
-  }
-  .thumb-item:hover .thumb-dl { opacity: 1; }
-
-  video, canvas { display: none; }
+video, canvas { display: none; }
 </style>
 </head>
 <body>
-
 <div class="app">
-  <p style="text-align:center; font-size:32px; font-weight:600; background: linear-gradient(90deg, #1a1a2e, #4a4a8a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing:1px; margin-bottom:36px; font-family:'Segoe UI', sans-serif;">الأشروفي تول</p>
-  <!-- Header -->
-  <div class="header">
-    <div class="header-icon">
-      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 9l5-3v12l-5-3"/></svg>
-    </div>
-    <div>
-      <h1>استخراج لقطات من الفيديو</h1>
-      <p class="subtitle">حوّل أي فيديو لمجموعة صور بضغطة واحدة</p>
-    </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1 class="hero-title"><span>✦</span> الأشروفي تول</h1>
+    <p class="hero-sub">استخراج لقطات من الفيديو <b>بسهولة</b> و<i>دقة عالية</i></p>
   </div>
 
-  <!-- Drop Zone -->
-  <div id="drop-zone"
-    onclick="document.getElementById('file-input').click()"
-    ondragover="event.preventDefault(); this.classList.add('drag-over')"
-    ondragleave="this.classList.remove('drag-over')"
-    ondrop="handleDrop(event)">
-    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    <p>اسحب الفيديو هنا أو اضغط للاختيار</p>
-    <span>يدعم MP4 · WebM · MOV · AVI</span>
-    <input type="file" id="file-input" accept="video/*" style="display:none" onchange="loadVideo(this.files[0])">
-  </div>
-
-  <!-- File Info -->
-  <div id="file-info">
-    <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><polygon points="8 13 11 16 16 11"/></svg>
-    <div id="file-info-text">
-      <div id="file-info-name"></div>
-      <div id="file-info-meta"></div>
-    </div>
-    <div class="check-icon">
-      <svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg>
-    </div>
-  </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <div class="control-full">
-      <label>عدد اللقطات المطلوبة</label>
-      <div class="slider-row">
-        <input type="range" id="count-slider" min="1" max="60" value="10" step="1"
-          oninput="document.getElementById('count-val').textContent = this.value">
-        <span class="slider-val" id="count-val">10</span>
+  <!-- Upload Card -->
+  <div class="card">
+    <div class="card-title">
+      <span>استخراج لقطات من الفيديو</span>
+      <div class="card-title-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 9l5-3v12l-5-3"/></svg>
       </div>
     </div>
-    <div>
-      <label>صيغة الصورة</label>
-      <select id="format-select">
-        <option value="image/jpeg">JPEG (أصغر حجم)</option>
-        <option value="image/png">PNG (أعلى جودة)</option>
-        <option value="image/webp">WebP (متوازن)</option>
-      </select>
+    <p style="font-size:13px; color:#64748b; margin-bottom:16px;">حوّل أي فيديو لمجموعة صور بضغطة واحدة</p>
+
+    <div id="drop-zone"
+      onclick="document.getElementById('file-input').click()"
+      ondragover="event.preventDefault(); this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handleDrop(event)">
+      <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+      <p>اسحب الفيديو هنا أو اضغط للاختيار</p>
+      <span>بدعم MP4 · WebM · MOV · AVI</span>
+      <input type="file" id="file-input" accept="video/*" style="display:none" onchange="loadVideo(this.files[0])">
     </div>
-    <div>
-      <label>جودة الصورة</label>
-      <select id="quality-select">
-        <option value="1.0">ممتازة</option>
-        <option value="0.85" selected>عالية</option>
-        <option value="0.65">متوسطة</option>
-        <option value="0.45">منخفضة</option>
-      </select>
+
+    <div id="file-info">
+      <div class="thumb-preview" id="thumb-preview">
+        <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </div>
+      <div style="flex:1; min-width:0;">
+        <div id="file-info-name"></div>
+        <div id="file-info-meta">
+          <span id="meta-res"></span>
+          <span id="meta-size"></span>
+          <span id="meta-dur">
+            <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:#64748b;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+        </div>
+      </div>
+      <div class="check-badge"><svg viewBox="0 0 14 14"><polyline points="2 7 6 11 12 3"/></svg></div>
+      <div class="delete-btn" onclick="removeVideo()">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Card -->
+  <div class="card">
+    <div class="slider-header">
+      <span class="slider-label">عدد اللقطات المطلوبة</span>
+      <span class="slider-val-badge" id="count-val">10</span>
+    </div>
+    <input type="range" id="count-slider" min="5" max="30" value="10" step="1"
+      oninput="updateSlider(this.value)">
+    <div class="slider-ticks">
+      <span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span>
+    </div>
+
+    <div class="controls-grid">
+      <div class="control-item">
+        <label>
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          جودة الصورة
+        </label>
+        <select id="quality-select">
+          <option value="1.0">ممتازة</option>
+          <option value="0.85" selected>عالية</option>
+          <option value="0.65">متوسطة</option>
+          <option value="0.45">منخفضة</option>
+        </select>
+      </div>
+      <div class="control-item">
+        <label>
+          <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+          صيغة الصورة
+        </label>
+        <select id="format-select">
+          <option value="image/jpeg">JPEG (أصغر حجم)</option>
+          <option value="image/png">PNG (أعلى جودة)</option>
+          <option value="image/webp">WebP (متوازن)</option>
+        </select>
+      </div>
     </div>
   </div>
 
   <!-- Extract Button -->
-  <button class="btn-primary" id="extract-btn" onclick="extractScreenshots()" disabled>
+  <button class="btn-extract" id="extract-btn" onclick="extractScreenshots()" disabled>
+    <span class="star">✦</span>
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
     ابدأ الاستخراج
   </button>
 
-  <!-- Progress -->
-  <div id="progress-section">
-    <div class="progress-row">
-      <span id="progress-label">جاري المعالجة...</span>
-      <span id="progress-pct">0%</span>
+  <!-- Progress Card -->
+  <div class="card" id="progress-section" style="margin-top:16px;">
+    <div class="progress-header">
+      <div>
+        <div id="progress-pct">0%</div>
+        <div id="progress-label">جاري المعالجة...</div>
+      </div>
+      <div class="done-badge" id="done-badge">
+        <svg viewBox="0 0 18 18"><polyline points="3 9 7 13 15 5"/></svg>
+        تم الاستخراج بنجاح!
+      </div>
     </div>
     <div class="progress-track">
       <div id="progress-bar"></div>
     </div>
+    <div class="progress-footer">
+      <span id="progress-frames">لقطة 0 / 0 تم استخراجها</span>
+    </div>
   </div>
 
-  <!-- Results -->
-  <div id="results-section">
+  <!-- Results Card -->
+  <div class="card" id="results-section" style="margin-top:16px;">
     <div class="results-header">
       <span id="results-count"></span>
-      <button class="btn-secondary" id="dl-all-btn" onclick="downloadAll()">
+      <button class="btn-download-all" id="dl-all-btn" onclick="downloadAll()">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        تحميل الكل
+        تحميل جميع اللقطات
       </button>
     </div>
-    <p class="hint">اضغط على أي صورة لتحميلها منفردة</p>
     <div id="thumbnails-grid"></div>
   </div>
+
 </div>
 
 <video id="hidden-video" playsinline></video>
@@ -285,6 +389,12 @@
 
 <script>
 var frames = [];
+var totalCount = 10;
+
+function updateSlider(v) {
+  document.getElementById('count-val').textContent = v;
+  totalCount = parseInt(v);
+}
 
 function handleDrop(e) {
   e.preventDefault();
@@ -298,17 +408,43 @@ function loadVideo(file) {
   var vid = document.getElementById('hidden-video');
   vid.src = URL.createObjectURL(file);
   vid.onloadedmetadata = function() {
-    var info = document.getElementById('file-info');
-    info.style.display = 'flex';
+    document.getElementById('file-info').style.display = 'flex';
     document.getElementById('file-info-name').textContent = file.name;
     var d = Math.round(vid.duration);
     var m = Math.floor(d/60), s = d%60;
     var mb = (file.size/1024/1024).toFixed(1);
-    document.getElementById('file-info-meta').textContent =
-      m + ':' + String(s).padStart(2,'0') + ' دقيقة  ·  ' + mb + ' MB  ·  ' +
-      vid.videoWidth + '×' + vid.videoHeight;
+    document.getElementById('meta-res').textContent = vid.videoWidth + '×' + vid.videoHeight;
+    document.getElementById('meta-size').textContent = mb + ' MB';
+    document.getElementById('meta-dur').innerHTML =
+      '<svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:#64748b;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' +
+      m + ':' + String(s).padStart(2,'0') + ' دقيقة';
     document.getElementById('extract-btn').disabled = false;
+
+    // thumbnail preview
+    var cnv = document.createElement('canvas');
+    vid.onseeked = function() {
+      cnv.width = 72; cnv.height = 48;
+      cnv.getContext('2d').drawImage(vid, 0, 0, 72, 48);
+      var img = document.createElement('img');
+      img.src = cnv.toDataURL('image/jpeg', 0.7);
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:6px;';
+      var tp = document.getElementById('thumb-preview');
+      tp.innerHTML = '';
+      tp.appendChild(img);
+      vid.onseeked = null;
+    };
+    vid.currentTime = Math.min(1, vid.duration * 0.1);
   };
+}
+
+function removeVideo() {
+  var vid = document.getElementById('hidden-video');
+  vid.src = '';
+  document.getElementById('file-info').style.display = 'none';
+  document.getElementById('extract-btn').disabled = true;
+  document.getElementById('file-input').value = '';
+  document.getElementById('thumb-preview').innerHTML =
+    '<svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:#a78bfa;fill:none;stroke-width:1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>';
 }
 
 function extractScreenshots() {
@@ -323,7 +459,10 @@ function extractScreenshots() {
   document.getElementById('thumbnails-grid').innerHTML = '';
   document.getElementById('results-section').style.display = 'none';
   document.getElementById('progress-section').style.display = 'block';
+  document.getElementById('done-badge').style.display = 'none';
   document.getElementById('extract-btn').disabled = true;
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('progress-pct').textContent = '0%';
 
   cnv.width = vid.videoWidth || 1280;
   cnv.height = vid.videoHeight || 720;
@@ -336,7 +475,7 @@ function extractScreenshots() {
 
   var cur = 0;
   function next() {
-    if (cur >= times.length) { done(fmt); return; }
+    if (cur >= times.length) { done(fmt, count); return; }
     vid.currentTime = times[cur];
     vid.onseeked = function() {
       ctx.drawImage(vid, 0, 0, cnv.width, cnv.height);
@@ -344,7 +483,7 @@ function extractScreenshots() {
       var pct = Math.round(((cur+1)/count)*100);
       document.getElementById('progress-bar').style.width = pct+'%';
       document.getElementById('progress-pct').textContent = pct+'%';
-      document.getElementById('progress-label').textContent = 'لقطة '+(cur+1)+' من '+count+'...';
+      document.getElementById('progress-frames').textContent = 'لقطة تم استخراجها ' + (cur+1) + ' / ' + count;
       cur++;
       setTimeout(next, 60);
     };
@@ -352,13 +491,14 @@ function extractScreenshots() {
   next();
 }
 
-function ext(fmt) {
+function getExt(fmt) {
   return fmt==='image/png' ? 'png' : fmt==='image/webp' ? 'webp' : 'jpg';
 }
 
-function done(fmt) {
-  var e = ext(fmt);
-  document.getElementById('progress-label').textContent = '✓ تم الاستخراج بنجاح!';
+function done(fmt, count) {
+  var e = getExt(fmt);
+  document.getElementById('done-badge').style.display = 'flex';
+  document.getElementById('progress-label').textContent = '';
   document.getElementById('extract-btn').disabled = false;
 
   var grid = document.getElementById('thumbnails-grid');
@@ -369,23 +509,23 @@ function done(fmt) {
     var img = document.createElement('img');
     img.src = url;
 
-    var lbl = document.createElement('div');
-    lbl.className = 'thumb-label';
-    lbl.textContent = 'لقطة #'+(i+1);
+    var num = document.createElement('div');
+    num.className = 'thumb-num';
+    num.textContent = 'لقطة #' + (i+1);
 
-    var dl = document.createElement('div');
-    dl.className = 'thumb-dl';
-    dl.textContent = '⬇ تحميل';
+    var overlay = document.createElement('div');
+    overlay.className = 'thumb-dl-overlay';
+    overlay.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
 
     var idx = i;
     wrap.onclick = function() { dlOne(frames[idx], idx+1, e); };
     wrap.appendChild(img);
-    wrap.appendChild(lbl);
-    wrap.appendChild(dl);
+    wrap.appendChild(num);
+    wrap.appendChild(overlay);
     grid.appendChild(wrap);
   });
 
-  document.getElementById('results-count').textContent = frames.length + ' لقطة جاهزة';
+  document.getElementById('results-count').textContent = frames.length + ' لقطة تم استخراجها';
   document.getElementById('results-section').style.display = 'block';
 }
 
@@ -400,7 +540,7 @@ function dlOne(url, num, e) {
 
 function downloadAll() {
   var fmt = document.getElementById('format-select').value;
-  var e = ext(fmt);
+  var e = getExt(fmt);
   var btn = document.getElementById('dl-all-btn');
   btn.disabled = true;
   btn.textContent = 'جاري التحميل...';
@@ -410,7 +550,7 @@ function downloadAll() {
       dlOne(url, i+1, e);
       if (i === frames.length-1) {
         btn.disabled = false;
-        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> تحميل الكل';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#a78bfa;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> تحميل جميع اللقطات';
       }
     }, delay);
     delay += 350;
