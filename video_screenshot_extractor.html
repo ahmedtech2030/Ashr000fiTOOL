@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استخراج لقطات من الفيديو</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 30px 16px;
+  }
+
+  .brand-bar {
+    width: 100%;
+    max-width: 720px;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+  }
+
+  .app {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 720px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .header-icon {
+    width: 48px; height: 48px;
+    background: #1a1a2e;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .header-icon svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+  .subtitle { font-size: 14px; color: #6b7280; margin-top: 2px; }
+
+  /* Drop zone */
+  #drop-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 20px;
+  }
+  #drop-zone:hover, #drop-zone.drag-over {
+    border-color: #1a1a2e;
+    background: #f8f9ff;
+  }
+  #drop-zone svg { width: 48px; height: 48px; stroke: #9ca3af; margin-bottom: 12px; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  #drop-zone p { font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+  #drop-zone span { font-size: 13px; color: #9ca3af; }
+
+  /* File info */
+  #file-info {
+    display: none;
+    background: #f3f4f6;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    align-items: center;
+    gap: 12px;
+  }
+  #file-info svg { width: 22px; height: 22px; flex-shrink: 0; stroke: #6b7280; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  #file-info-text { flex: 1; min-width: 0; }
+  #file-info-name { font-size: 14px; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #file-info-meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .check-icon { width: 20px; height: 20px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .check-icon svg { width: 12px; height: 12px; stroke: #059669; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Controls */
+  .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .control-full { grid-column: 1 / -1; }
+
+  label { font-size: 13px; color: #6b7280; display: block; margin-bottom: 6px; font-weight: 500; }
+
+  .slider-row { display: flex; align-items: center; gap: 12px; }
+  input[type="range"] {
+    flex: 1; height: 4px; accent-color: #1a1a2e; cursor: pointer;
+  }
+  .slider-val { font-size: 18px; font-weight: 700; color: #1a1a2e; min-width: 32px; text-align: center; }
+
+  select {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #e5e7eb;
+    border-radius: 8px; font-size: 14px; color: #1a1a2e;
+    background: #fff; cursor: pointer; outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  select:focus { border-color: #1a1a2e; }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%; padding: 13px; font-size: 16px; font-weight: 700;
+    background: #1a1a2e; color: #fff; border: none;
+    border-radius: 10px; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover:not(:disabled) { background: #2d2d4e; }
+  .btn-primary:active:not(:disabled) { transform: scale(0.99); }
+  .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+  .btn-primary svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .btn-secondary {
+    padding: 8px 16px; font-size: 13px; font-weight: 600;
+    background: #fff; color: #1a1a2e;
+    border: 1.5px solid #e5e7eb; border-radius: 8px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit;
+  }
+  .btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+  .btn-secondary svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Progress */
+  #progress-section { display: none; margin-top: 20px; }
+  .progress-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  #progress-label { font-size: 13px; color: #6b7280; }
+  #progress-pct { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+  .progress-track { background: #e5e7eb; border-radius: 99px; height: 8px; overflow: hidden; }
+  #progress-bar { height: 100%; width: 0%; background: #1a1a2e; border-radius: 99px; transition: width 0.25s; }
+
+  /* Results */
+  #results-section { display: none; margin-top: 28px; }
+  .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  #results-count { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+  .hint { font-size: 12px; color: #9ca3af; margin-bottom: 14px; }
+
+  #thumbnails-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .thumb-item {
+    position: relative; border-radius: 8px; overflow: hidden;
+    border: 1.5px solid #e5e7eb; cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .thumb-item:hover { border-color: #1a1a2e; transform: scale(1.02); }
+  .thumb-item img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+  .thumb-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.55); color: #fff;
+    font-size: 11px; padding: 3px 7px; text-align: center;
+  }
+  .thumb-dl {
+    position: absolute; top: 5px; left: 5px;
+    background: rgba(0,0,0,0.55); color: #fff;
+    border-radius: 5px; padding: 3px 6px; font-size: 11px;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .thumb-item:hover .thumb-dl { opacity: 1; }
+
+  video, canvas { display: none; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <p style="text-align:center; font-size:32px; font-weight:600; background: linear-gradient(90deg, #1a1a2e, #4a4a8a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing:1px; margin-bottom:36px; font-family:'Segoe UI', sans-serif;">الأشروفي تول</p>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 9l5-3v12l-5-3"/></svg>
+    </div>
+    <div>
+      <h1>استخراج لقطات من الفيديو</h1>
+      <p class="subtitle">حوّل أي فيديو لمجموعة صور بضغطة واحدة</p>
+    </div>
+  </div>
+
+  <!-- Drop Zone -->
+  <div id="drop-zone"
+    onclick="document.getElementById('file-input').click()"
+    ondragover="event.preventDefault(); this.classList.add('drag-over')"
+    ondragleave="this.classList.remove('drag-over')"
+    ondrop="handleDrop(event)">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <p>اسحب الفيديو هنا أو اضغط للاختيار</p>
+    <span>يدعم MP4 · WebM · MOV · AVI</span>
+    <input type="file" id="file-input" accept="video/*" style="display:none" onchange="loadVideo(this.files[0])">
+  </div>
+
+  <!-- File Info -->
+  <div id="file-info">
+    <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><polygon points="8 13 11 16 16 11"/></svg>
+    <div id="file-info-text">
+      <div id="file-info-name"></div>
+      <div id="file-info-meta"></div>
+    </div>
+    <div class="check-icon">
+      <svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="control-full">
+      <label>عدد اللقطات المطلوبة</label>
+      <div class="slider-row">
+        <input type="range" id="count-slider" min="1" max="60" value="10" step="1"
+          oninput="document.getElementById('count-val').textContent = this.value">
+        <span class="slider-val" id="count-val">10</span>
+      </div>
+    </div>
+    <div>
+      <label>صيغة الصورة</label>
+      <select id="format-select">
+        <option value="image/jpeg">JPEG (أصغر حجم)</option>
+        <option value="image/png">PNG (أعلى جودة)</option>
+        <option value="image/webp">WebP (متوازن)</option>
+      </select>
+    </div>
+    <div>
+      <label>جودة الصورة</label>
+      <select id="quality-select">
+        <option value="1.0">ممتازة</option>
+        <option value="0.85" selected>عالية</option>
+        <option value="0.65">متوسطة</option>
+        <option value="0.45">منخفضة</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Extract Button -->
+  <button class="btn-primary" id="extract-btn" onclick="extractScreenshots()" disabled>
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    ابدأ الاستخراج
+  </button>
+
+  <!-- Progress -->
+  <div id="progress-section">
+    <div class="progress-row">
+      <span id="progress-label">جاري المعالجة...</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div id="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-section">
+    <div class="results-header">
+      <span id="results-count"></span>
+      <button class="btn-secondary" id="dl-all-btn" onclick="downloadAll()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        تحميل الكل
+      </button>
+    </div>
+    <p class="hint">اضغط على أي صورة لتحميلها منفردة</p>
+    <div id="thumbnails-grid"></div>
+  </div>
+</div>
+
+<video id="hidden-video" playsinline></video>
+<canvas id="hidden-canvas"></canvas>
+
+<script>
+var frames = [];
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  var f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('video/')) loadVideo(f);
+}
+
+function loadVideo(file) {
+  if (!file) return;
+  var vid = document.getElementById('hidden-video');
+  vid.src = URL.createObjectURL(file);
+  vid.onloadedmetadata = function() {
+    var info = document.getElementById('file-info');
+    info.style.display = 'flex';
+    document.getElementById('file-info-name').textContent = file.name;
+    var d = Math.round(vid.duration);
+    var m = Math.floor(d/60), s = d%60;
+    var mb = (file.size/1024/1024).toFixed(1);
+    document.getElementById('file-info-meta').textContent =
+      m + ':' + String(s).padStart(2,'0') + ' دقيقة  ·  ' + mb + ' MB  ·  ' +
+      vid.videoWidth + '×' + vid.videoHeight;
+    document.getElementById('extract-btn').disabled = false;
+  };
+}
+
+function extractScreenshots() {
+  var vid = document.getElementById('hidden-video');
+  var cnv = document.getElementById('hidden-canvas');
+  var ctx = cnv.getContext('2d');
+  var count = parseInt(document.getElementById('count-slider').value);
+  var fmt = document.getElementById('format-select').value;
+  var q = parseFloat(document.getElementById('quality-select').value);
+
+  frames = [];
+  document.getElementById('thumbnails-grid').innerHTML = '';
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('progress-section').style.display = 'block';
+  document.getElementById('extract-btn').disabled = true;
+
+  cnv.width = vid.videoWidth || 1280;
+  cnv.height = vid.videoHeight || 720;
+
+  var dur = vid.duration;
+  var times = [];
+  for (var i = 0; i < count; i++) {
+    times.push(count === 1 ? dur/2 : (i/(count-1))*dur);
+  }
+
+  var cur = 0;
+  function next() {
+    if (cur >= times.length) { done(fmt); return; }
+    vid.currentTime = times[cur];
+    vid.onseeked = function() {
+      ctx.drawImage(vid, 0, 0, cnv.width, cnv.height);
+      frames.push(cnv.toDataURL(fmt, q));
+      var pct = Math.round(((cur+1)/count)*100);
+      document.getElementById('progress-bar').style.width = pct+'%';
+      document.getElementById('progress-pct').textContent = pct+'%';
+      document.getElementById('progress-label').textContent = 'لقطة '+(cur+1)+' من '+count+'...';
+      cur++;
+      setTimeout(next, 60);
+    };
+  }
+  next();
+}
+
+function ext(fmt) {
+  return fmt==='image/png' ? 'png' : fmt==='image/webp' ? 'webp' : 'jpg';
+}
+
+function done(fmt) {
+  var e = ext(fmt);
+  document.getElementById('progress-label').textContent = '✓ تم الاستخراج بنجاح!';
+  document.getElementById('extract-btn').disabled = false;
+
+  var grid = document.getElementById('thumbnails-grid');
+  frames.forEach(function(url, i) {
+    var wrap = document.createElement('div');
+    wrap.className = 'thumb-item';
+
+    var img = document.createElement('img');
+    img.src = url;
+
+    var lbl = document.createElement('div');
+    lbl.className = 'thumb-label';
+    lbl.textContent = 'لقطة #'+(i+1);
+
+    var dl = document.createElement('div');
+    dl.className = 'thumb-dl';
+    dl.textContent = '⬇ تحميل';
+
+    var idx = i;
+    wrap.onclick = function() { dlOne(frames[idx], idx+1, e); };
+    wrap.appendChild(img);
+    wrap.appendChild(lbl);
+    wrap.appendChild(dl);
+    grid.appendChild(wrap);
+  });
+
+  document.getElementById('results-count').textContent = frames.length + ' لقطة جاهزة';
+  document.getElementById('results-section').style.display = 'block';
+}
+
+function dlOne(url, num, e) {
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'screenshot_' + String(num).padStart(3,'0') + '.' + e;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function downloadAll() {
+  var fmt = document.getElementById('format-select').value;
+  var e = ext(fmt);
+  var btn = document.getElementById('dl-all-btn');
+  btn.disabled = true;
+  btn.textContent = 'جاري التحميل...';
+  var delay = 0;
+  frames.forEach(function(url, i) {
+    setTimeout(function() {
+      dlOne(url, i+1, e);
+      if (i === frames.length-1) {
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> تحميل الكل';
+      }
+    }, delay);
+    delay += 350;
+  });
+}
+</script>
+</body>
+</html>
