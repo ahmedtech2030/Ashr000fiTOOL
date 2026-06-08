@@ -172,23 +172,38 @@ input[type="range"]::-webkit-slider-thumb {
 .control-item label { font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .control-item label svg { width: 14px; height: 14px; stroke: #64748b; fill: none; stroke-width: 2; }
 
-select {
-  width: 100%; padding: 10px 14px;
+/* Custom Dropdown */
+.custom-select { position: relative; user-select: none; }
+.cs-selected {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
   background: #1e1b4b;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
-  color: #e2e8f0;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-  font-family: inherit;
+  color: #e2e8f0; font-size: 14px; cursor: pointer;
   transition: border-color 0.2s;
 }
-select option {
-  background: #1e1b4b;
-  color: #e2e8f0;
+.cs-selected:hover { border-color: rgba(139,92,246,0.5); }
+.cs-selected svg { width: 16px; height: 16px; stroke: #64748b; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s; flex-shrink: 0; margin-right: 8px; }
+.custom-select.open .cs-selected { border-color: rgba(139,92,246,0.5); border-radius: 10px 10px 0 0; }
+.custom-select.open .cs-selected svg { transform: rotate(180deg); }
+.cs-options {
+  display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 999;
+  background: #1a1640;
+  border: 1px solid rgba(139,92,246,0.4);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
-select:focus { border-color: rgba(139,92,246,0.5); }
+.custom-select.open .cs-options { display: block; }
+.cs-option {
+  padding: 10px 14px; color: #94a3b8; font-size: 14px; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  background: #1a1640;
+}
+.cs-option:hover { background: #2a2060; color: #e2e8f0; }
+.cs-option.cs-active { color: #a78bfa; background: #231d5a; }
 
 /* Extract button */
 .btn-extract {
@@ -326,23 +341,35 @@ video, canvas { display: none; }
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           جودة الصورة
         </label>
-        <select id="quality-select">
-          <option value="1.0">ممتازة</option>
-          <option value="0.85" selected>عالية</option>
-          <option value="0.65">متوسطة</option>
-          <option value="0.45">منخفضة</option>
-        </select>
+        <div class="custom-select" id="quality-dd">
+          <div class="cs-selected" onclick="toggleDD('quality-dd')">
+            <span class="cs-label">عالية</span>
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="cs-options">
+            <div class="cs-option" data-val="1.0" onclick="selectOpt('quality-dd','1.0','ممتازة')">ممتازة</div>
+            <div class="cs-option cs-active" data-val="0.85" onclick="selectOpt('quality-dd','0.85','عالية')">عالية</div>
+            <div class="cs-option" data-val="0.65" onclick="selectOpt('quality-dd','0.65','متوسطة')">متوسطة</div>
+            <div class="cs-option" data-val="0.45" onclick="selectOpt('quality-dd','0.45','منخفضة')">منخفضة</div>
+          </div>
+        </div>
       </div>
       <div class="control-item">
         <label>
           <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
           صيغة الصورة
         </label>
-        <select id="format-select">
-          <option value="image/jpeg">JPEG (أصغر حجم)</option>
-          <option value="image/png">PNG (أعلى جودة)</option>
-          <option value="image/webp">WebP (متوازن)</option>
-        </select>
+        <div class="custom-select" id="format-dd">
+          <div class="cs-selected" onclick="toggleDD('format-dd')">
+            <span class="cs-label">JPEG (أصغر حجم)</span>
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="cs-options">
+            <div class="cs-option cs-active" data-val="image/jpeg" onclick="selectOpt('format-dd','image/jpeg','JPEG (أصغر حجم)')">JPEG (أصغر حجم)</div>
+            <div class="cs-option" data-val="image/png" onclick="selectOpt('format-dd','image/png','PNG (أعلى جودة)')">PNG (أعلى جودة)</div>
+            <div class="cs-option" data-val="image/webp" onclick="selectOpt('format-dd','image/webp','WebP (متوازن)')">WebP (متوازن)</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -394,6 +421,59 @@ video, canvas { display: none; }
 <script>
 var frames = [];
 var totalCount = 10;
+var ddValues = { 'quality-dd': '0.85', 'format-dd': 'image/jpeg' };
+
+function toggleDD(id) {
+  var dd = document.getElementById(id);
+  var isOpen = dd.classList.contains('open');
+  closeAllDD();
+  if (!isOpen) openDD(dd);
+}
+
+function openDD(dd) {
+  dd.classList.add('open');
+  var opts = dd.querySelector('.cs-options');
+  var rect = dd.querySelector('.cs-selected').getBoundingClientRect();
+  var portal = document.createElement('div');
+  portal.id = 'dd-portal-' + dd.id;
+  portal.style.cssText = 'position:fixed; top:' + (rect.bottom) + 'px; left:' + rect.left + 'px; width:' + rect.width + 'px; z-index:99999;';
+  portal.innerHTML = opts.innerHTML;
+  portal.style.background = '#1a1640';
+  portal.style.border = '1px solid rgba(139,92,246,0.4)';
+  portal.style.borderTop = 'none';
+  portal.style.borderRadius = '0 0 10px 10px';
+  portal.style.boxShadow = '0 8px 24px rgba(0,0,0,0.8)';
+  portal.style.overflow = 'hidden';
+  portal.querySelectorAll('.cs-option').forEach(function(el) {
+    el.style.cssText = 'padding:10px 14px; font-size:14px; cursor:pointer; background:#1a1640; color:' + (el.classList.contains('cs-active') ? '#a78bfa' : '#94a3b8') + ';';
+    el.onmouseover = function() { this.style.background = '#2a2060'; this.style.color = '#e2e8f0'; };
+    el.onmouseout = function() { this.style.background = el.classList.contains('cs-active') ? '#231d5a' : '#1a1640'; this.style.color = el.classList.contains('cs-active') ? '#a78bfa' : '#94a3b8'; };
+  });
+  document.body.appendChild(portal);
+}
+
+function closeAllDD() {
+  document.querySelectorAll('.custom-select.open').forEach(function(el) {
+    el.classList.remove('open');
+    var p = document.getElementById('dd-portal-' + el.id);
+    if (p) p.remove();
+  });
+}
+
+function selectOpt(ddId, val, label) {
+  ddValues[ddId] = val;
+  document.querySelector('#' + ddId + ' .cs-label').textContent = label;
+  document.querySelectorAll('#' + ddId + ' .cs-option').forEach(function(el) {
+    el.classList.toggle('cs-active', el.dataset.val === val);
+  });
+  closeAllDD();
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.custom-select') && !e.target.closest('[id^="dd-portal"]')) {
+    closeAllDD();
+  }
+});
 
 function updateSlider(v) {
   document.getElementById('count-val').textContent = v;
@@ -456,8 +536,8 @@ function extractScreenshots() {
   var cnv = document.getElementById('hidden-canvas');
   var ctx = cnv.getContext('2d');
   var count = parseInt(document.getElementById('count-slider').value);
-  var fmt = document.getElementById('format-select').value;
-  var q = parseFloat(document.getElementById('quality-select').value);
+  var fmt = ddValues['format-dd'];
+  var q = parseFloat(ddValues['quality-dd']);
 
   frames = [];
   document.getElementById('thumbnails-grid').innerHTML = '';
@@ -543,7 +623,7 @@ function dlOne(url, num, e) {
 }
 
 function downloadAll() {
-  var fmt = document.getElementById('format-select').value;
+  var fmt = ddValues['format-dd'];
   var e = getExt(fmt);
   var btn = document.getElementById('dl-all-btn');
   btn.disabled = true;
